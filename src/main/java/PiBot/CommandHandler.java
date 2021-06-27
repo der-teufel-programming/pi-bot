@@ -24,6 +24,7 @@ public class CommandHandler implements MessageCreateListener {
 
     @Override
     public void onMessageCreate(MessageCreateEvent event) {
+	if (event.getMessageAuthor().isBotUser()) return;
         switch (event.getMessageContent().charAt(0)) {
             case '!' ->
                 handleAdminCommand(event);
@@ -66,8 +67,9 @@ public class CommandHandler implements MessageCreateListener {
             return;
         }
         String tex = "\\documentclass[margin=.5cm]{standalone}\n"
-                + "\\usepackage{amsmath,amsfonts,cancel,listings,xcolor}\n"
+                + "\\usepackage{amsmath,amsfonts,MnSymbol,cancel,listings,xcolor}\n"
                 + "\\usepackage{graphicx,tikz}\n"
+		+ "\\usepackage[g]{esvect}\n"
                 + "\\usetikzlibrary{decorations.pathreplacing, calc, arrows}\n"
                 + "\\begin{document}\n"
                 + "$\\displaystyle\n"
@@ -80,7 +82,8 @@ public class CommandHandler implements MessageCreateListener {
         if (img != null) {
             new MessageBuilder()
                     .setEmbed(new EmbedBuilder()
-                                        .addField("Code", maxima)
+                                        .addField("Input:", maxima)
+					.addField("Result:", tex_code)
                                         .setImage(img)
                                         .setColor(Color.BLUE))
                     .send(event.getChannel());
@@ -103,10 +106,15 @@ public class CommandHandler implements MessageCreateListener {
             try (FileWriter writer = new FileWriter("./unknown.tex")) {
                 writer.write(tex);
             }
-            Runtime.getRuntime().exec("lualatex unknown.tex");
-            Runtime.getRuntime().exec("pdftoppm -png -r 300 -singlefile unknown.pdf unknown");
+	    try {
+            	Runtime.getRuntime().exec("lualatex unknown.tex").waitFor();
+            	Runtime.getRuntime().exec("pdftoppm -png -r 300 -singlefile unknown.pdf unknown").waitFor();
+	    } catch (InterruptedException e) {
+		    System.err.println(e);
+		    return null;
+	    }
         } catch (IOException e) {
-            System.err.println(e.getLocalizedMessage());
+            System.err.println(e);
             return null;
         }
         return new File("./unknown.png");
@@ -117,8 +125,13 @@ public class CommandHandler implements MessageCreateListener {
             try (FileWriter writer = new FileWriter("./" + name + ".tex")) {
                 writer.write(tex);
             }
-            Runtime.getRuntime().exec("lualatex " + name + ".tex");
-            Runtime.getRuntime().exec("pdftoppm -png -r 300 -singlefile " + name + ".pdf " + name);
+	    try {
+            	Runtime.getRuntime().exec("lualatex " + name + ".tex").waitFor();
+            	Runtime.getRuntime().exec("pdftoppm -png -r 300 -singlefile " + name + ".pdf " + name).waitFor();
+	    } catch (InterruptedException e) {
+		    System.err.println(e);
+		    return null;
+	    }
         } catch (IOException e) {
             System.err.println(e.getLocalizedMessage());
             return null;
