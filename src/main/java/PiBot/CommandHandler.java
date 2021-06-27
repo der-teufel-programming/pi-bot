@@ -7,13 +7,13 @@ package PiBot;
 
 import java.io.IOException;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.FileWriter;
 import org.javacord.api.event.message.MessageCreateEvent;
 import org.javacord.api.listener.message.MessageCreateListener;
 import org.javacord.api.entity.message.MessageBuilder;
 import org.javacord.api.entity.message.MessageDecoration;
+import org.javacord.api.entity.channel.TextChannel;
+import org.javacord.api.entity.message.embed.EmbedBuilder;
 
 /**
  *
@@ -41,8 +41,7 @@ public class CommandHandler implements MessageCreateListener {
     void handleTeXCommand(MessageCreateEvent event) {
         String[] args = event.getMessageContent().split(" ", 2);
         String user = event.getMessageAuthor().getIdAsString();
-        
-        
+
     }
 
     // Math/Maxima commands prefixed with `=`
@@ -54,9 +53,17 @@ public class CommandHandler implements MessageCreateListener {
             result = new String(Runtime.getRuntime().exec(command).getInputStream().readAllBytes());
         } catch (IOException e) {
             System.err.println(e.getLocalizedMessage());
+            sendErrorMessage(e, event.getChannel());
             return;
         }
-        String tex_code = result.split("[$]")[2];
+        String tex_code;
+        try {
+            tex_code = result.split("[$]")[2];
+        } catch (ArrayIndexOutOfBoundsException e) {
+            System.err.println(e.getLocalizedMessage());
+            sendErrorMessage(e, event.getChannel());
+            return;
+        }
         String tex = "\\documentclass[margin=.5cm]{standalone}\n"
                 + "\\usepackage{amsmath,amsfonts,MnSymbol,cancel,listings,xcolor}\n"
                 + "\\usepackage{graphicx,tikz}\n"
@@ -76,13 +83,12 @@ public class CommandHandler implements MessageCreateListener {
     }
 
     // Help prefixed with `?`
-    
     //Utils
     File convertTeXtoImg(String tex) {
         try {
-            FileWriter writer = new FileWriter("./unknown.tex");
-            writer.write(tex);
-            writer.close();
+            try (FileWriter writer = new FileWriter("./unknown.tex")) {
+                writer.write(tex);
+            }
             System.out.println(new String(Runtime.getRuntime().exec("lualatex unknown.tex").getInputStream().readAllBytes()));
             System.out.println(new String(Runtime.getRuntime().exec("pdftoppm -png -r 300 -singlefile unknown.pdf unknown").getInputStream().readAllBytes()));
         } catch (IOException e) {
@@ -94,9 +100,9 @@ public class CommandHandler implements MessageCreateListener {
 
     File convertTeXtoImg(String tex, String name) {
         try {
-            FileWriter writer = new FileWriter("./" + name + ".tex");
-            writer.write(tex);
-            writer.close();
+            try (FileWriter writer = new FileWriter("./" + name + ".tex")) {
+                writer.write(tex);
+            }
             System.out.println(new String(Runtime.getRuntime().exec("lualatex " + name + ".tex").getInputStream().readAllBytes()));
             System.out.println(new String(Runtime.getRuntime().exec("pdftoppm -png -r 300 -singlefile " + name + ".pdf " + name).getInputStream().readAllBytes()));
         } catch (IOException e) {
@@ -104,5 +110,12 @@ public class CommandHandler implements MessageCreateListener {
             return null;
         }
         return new File("./" + name + ".png");
+    }
+
+    void sendErrorMessage(Exception e, TextChannel c) {
+        new MessageBuilder()
+                .append("Error!", MessageDecoration.BOLD).appendNewLine()
+                .setEmbed(new EmbedBuilder().addField("Message:", e.getLocalizedMessage())
+                                            .addField("Stacktrace:", e.getStackTrace().toString())).send(c);
     }
 }
