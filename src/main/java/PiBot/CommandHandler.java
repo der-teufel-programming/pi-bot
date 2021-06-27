@@ -66,9 +66,8 @@ public class CommandHandler implements MessageCreateListener {
             return;
         }
         String tex = "\\documentclass[margin=.5cm]{standalone}\n"
-                + "\\usepackage{amsmath,amsfonts,MnSymbol,cancel,listings,xcolor}\n"
+                + "\\usepackage{amsmath,amsfonts,cancel,listings,xcolor}\n"
                 + "\\usepackage{graphicx,tikz}\n"
-                + "\\usepackage[g]{esvect}\n"
                 + "\\usetikzlibrary{decorations.pathreplacing, calc, arrows}\n"
                 + "\\begin{document}\n"
                 + "$\\displaystyle\n"
