@@ -5,6 +5,7 @@
  */
 package PiBot;
 
+import java.awt.Color;
 import java.io.IOException;
 import java.io.File;
 import java.io.FileWriter;
@@ -76,7 +77,7 @@ public class CommandHandler implements MessageCreateListener {
                 + "\\end{document});";
         File img = convertTeXtoImg(tex);
         if (img != null) {
-            new MessageBuilder().append(maxima, MessageDecoration.CODE_LONG).addAttachment(img).send(event.getChannel());
+            new MessageBuilder().setEmbed(new EmbedBuilder().addField("Code", maxima).setImage(img)).send(event.getChannel());//.append(maxima, MessageDecoration.CODE_LONG).addAttachment(img).send(event.getChannel());
         } else {
             new MessageBuilder().append("Error!", MessageDecoration.BOLD).send(event.getChannel());
         }
@@ -114,8 +115,8 @@ public class CommandHandler implements MessageCreateListener {
 
     void sendErrorMessage(Exception e, TextChannel c) {
         new MessageBuilder()
-                .append("Error!", MessageDecoration.BOLD).appendNewLine()
-                .setEmbed(new EmbedBuilder().addField("Message:", e.getLocalizedMessage())
-                                            .addField("Stacktrace:", e.getStackTrace().toString())).send(c);
+                .setEmbed(new EmbedBuilder().addField("Error:", e.toString())
+                                            .setColor(Color.red))
+                .send(c);
     }
 }
