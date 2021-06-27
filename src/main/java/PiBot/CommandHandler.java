@@ -80,14 +80,16 @@ public class CommandHandler implements MessageCreateListener {
         
         if (img != null) {
             new MessageBuilder()
-                    .setEmbed(new EmbedBuilder().addField("Code", maxima)
-                                                .setImage(img)
-                                                .setColor(Color.BLUE))
+                    .setEmbed(new EmbedBuilder()
+                                        .addField("Code", maxima)
+                                        .setImage(img)
+                                        .setColor(Color.BLUE))
                     .send(event.getChannel());
         } else {
             new MessageBuilder()
-                    .setEmbed(new EmbedBuilder().addField("Error!", "")
-                                                .setColor(Color.RED))
+                    .setEmbed(new EmbedBuilder()
+                                        .addField("Error!", "")
+                                        .setColor(Color.RED))
                     .send(event.getChannel());
         }
     }
@@ -102,8 +104,8 @@ public class CommandHandler implements MessageCreateListener {
             try (FileWriter writer = new FileWriter("./unknown.tex")) {
                 writer.write(tex);
             }
-            System.out.println(new String(Runtime.getRuntime().exec("lualatex unknown.tex").getInputStream().readAllBytes()));
-            System.out.println(new String(Runtime.getRuntime().exec("pdftoppm -png -r 300 -singlefile unknown.pdf unknown").getInputStream().readAllBytes()));
+            Runtime.getRuntime().exec("lualatex unknown.tex");
+            Runtime.getRuntime().exec("pdftoppm -png -r 300 -singlefile unknown.pdf unknown");
         } catch (IOException e) {
             System.err.println(e.getLocalizedMessage());
             return null;
@@ -116,8 +118,8 @@ public class CommandHandler implements MessageCreateListener {
             try (FileWriter writer = new FileWriter("./" + name + ".tex")) {
                 writer.write(tex);
             }
-            System.out.println(new String(Runtime.getRuntime().exec("lualatex " + name + ".tex").getInputStream().readAllBytes()));
-            System.out.println(new String(Runtime.getRuntime().exec("pdftoppm -png -r 300 -singlefile " + name + ".pdf " + name).getInputStream().readAllBytes()));
+            Runtime.getRuntime().exec("lualatex " + name + ".tex");
+            Runtime.getRuntime().exec("pdftoppm -png -r 300 -singlefile " + name + ".pdf " + name);
         } catch (IOException e) {
             System.err.println(e.getLocalizedMessage());
             return null;
@@ -127,8 +129,9 @@ public class CommandHandler implements MessageCreateListener {
 
     void sendErrorMessage(Exception e, TextChannel c) {
         new MessageBuilder()
-                .setEmbed(new EmbedBuilder().addField("Error:", e.toString())
-                                            .setColor(Color.RED))
+                .setEmbed(new EmbedBuilder()
+                                    .addField("Error:", e.toString())
+                                    .setColor(Color.RED))
                 .send(c);
     }
 }
