@@ -75,15 +75,27 @@ public class CommandHandler implements MessageCreateListener {
                 + tex_code
                 + "$\n"
                 + "\\end{document});";
+        
         File img = convertTeXtoImg(tex);
+        
         if (img != null) {
-            new MessageBuilder().setEmbed(new EmbedBuilder().addField("Code", maxima).setImage(img)).send(event.getChannel());//.append(maxima, MessageDecoration.CODE_LONG).addAttachment(img).send(event.getChannel());
+            new MessageBuilder()
+                    .setEmbed(new EmbedBuilder().addField("Code", maxima)
+                                                .setImage(img)
+                                                .setColor(Color.BLUE))
+                    .send(event.getChannel());
         } else {
-            new MessageBuilder().append("Error!", MessageDecoration.BOLD).send(event.getChannel());
+            new MessageBuilder()
+                    .setEmbed(new EmbedBuilder().addField("Error!", "")
+                                                .setColor(Color.RED))
+                    .send(event.getChannel());
         }
     }
 
     // Help prefixed with `?`
+    
+    
+    
     //Utils
     File convertTeXtoImg(String tex) {
         try {
@@ -116,7 +128,7 @@ public class CommandHandler implements MessageCreateListener {
     void sendErrorMessage(Exception e, TextChannel c) {
         new MessageBuilder()
                 .setEmbed(new EmbedBuilder().addField("Error:", e.toString())
-                                            .setColor(Color.red))
+                                            .setColor(Color.RED))
                 .send(c);
     }
 }
