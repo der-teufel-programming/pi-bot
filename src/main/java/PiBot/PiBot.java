@@ -20,7 +20,7 @@ public class PiBot {
         // Create the bot connection
         
         DiscordApi api = new DiscordApiBuilder()
-                .setToken("ODU2MzEwNDI3MDM3NTk3Njk3.YM_LOw.QruUo-w1cV3YVC1lnTfFSx-w6sY")
+                .setToken(`ENTER TOKEN HERE`)
                 .login().join();
 
         api.addMessageCreateListener(new CommandHandler());
